@@ -10,6 +10,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.By.ByXPath;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -21,6 +22,7 @@ import org.testng.annotations.Test;
 
 import Resources.base;
 import pageObjects.CalendarPage;
+import pageObjects.DeliveryPage;
 import pageObjects.LandingPage;
 import pageObjects.PhoneRepairs;
 import pageObjects.PopUp;
@@ -35,7 +37,7 @@ public class calendar extends base{
 	
 	
 	@Test
-	public void basePageNavigation() throws IOException, InterruptedException {
+	public void calendarCheck() throws IOException, InterruptedException {
 		
 		
 		//initialise driver
@@ -50,12 +52,11 @@ public class calendar extends base{
 		iPhones ip = new iPhones(driver);
 		ProductPage pp = new ProductPage(driver);
 		CalendarPage c = new CalendarPage(driver);
+		DeliveryPage dp = new DeliveryPage(driver);
 		
-	
 		//close popup
 		p.getExitPopup().click();
 		
-	
 		//Fix my device
 		l.getFixButton().click();
 		
@@ -66,7 +67,6 @@ public class calendar extends base{
 		//click Apple
 		pr.getApple().click();
 	
-		
 		//number of phones
 		List<WebElement> iButtons = driver.findElements(By.xpath("//button[@class='btn-fix']"));
 		int iphoneSize = iButtons.size();
@@ -77,31 +77,28 @@ public class calendar extends base{
 		int randomiPhone = ThreadLocalRandom.current().nextInt(0, iphoneSize);
 		iButtons.get(randomiPhone).click();
 		
-		
+		//save phone name to a variable
+		String phoneName = 	pp.getPhone().getText();
+		phoneName = phoneName.replaceAll("Repairs", "");
 	
 		//save number of repairs to a variable
 		int repairsSize = pp.getAllRepairs().size();
 		
-		//test
-		//System.out.println("Size of All Repairs is : " + repairsSize);
-		
 		//random number of repairs to be generated
 		int randomNumber = ThreadLocalRandom.current().nextInt(0, repairsSize);
-		System.out.println("The random number of repairs to be selected:" + randomNumber);
+		
 		
 		
 		//select a random number of random repairs
 		for (int i = 1; i <=randomNumber; i++) {
 			
 			int randomRepair = ThreadLocalRandom.current().nextInt(1, repairsSize);
-			System.out.println("Clicking on repair number: " + randomRepair);
-			pp.getAllRepairs().get(randomRepair).click();
-			
-			
+			pp.getAllRepairs().get(randomRepair).click();	
 		}
-		
+
 		//click Book Repair Now
-		pp.getBookRepair().click();
+		JavascriptExecutor executor = (JavascriptExecutor)driver;
+		executor.executeScript("arguments[0].click();", pp.getBookRepair());
 		
 		//click on Repair In Store
 		c.getInStore().click();
@@ -109,30 +106,59 @@ public class calendar extends base{
 		//click on Calendar
 		c.getCalendar().click();
 		
-		
-		
-		// get today's date
-		Calendar cal = Calendar.getInstance();
-		int whatYear = cal.get(Calendar.YEAR);
-		int whatMonth = cal.get(Calendar.MONTH);
-		int whatDay = cal.get(Calendar.DAY_OF_MONTH);
-		
-		//how many days displayed
-	int countDays =	c.getAllDays().siz
-			
-			int iphoneButtons = iButtons.size();
-		 
-		//click on year
+		//click on a target year
 		c.getYear().click();
+		driver.findElement(By.xpath("//div[@data-value='" + c.targetYear + "']")).click();
 		
-		while (c.get)
+		//click on a target month
+		c.getMonth().click();
+		driver.findElement(By.xpath("//div[text()='" + c.targetMonth1 + "']")).click();
+		
+		//click on a target day
+		
+		try {
+			driver.findElement(By.xpath("//td[@data-date='"+ c.targetDay + "']")).click();
+		}
+		
+		catch(org.openqa.selenium.StaleElementReferenceException ex) {
+		
+			driver.findElement(By.xpath("//td[@data-date='"+ c.targetDay + "']")).click();
+		}
 		
 		
-				
+		//click on a target hour
+		WebElement targetHour = driver.findElement(By.xpath("//div[text()='16:30']")); 
+		
+		for (int i = 1; i <=12; i++) {
+			
+			c.getCalendarPrev().click();
+			
+		}
+		
+		List<WebElement> targetHours = driver.findElements(By.xpath("//div[text()='12:30']"));
+		
+		//Boolean isTargetHourPresent = targetHours.size() > 0; 
+		Boolean isTargetHourDisplayed = targetHour.isDisplayed();
+		
+		while (isTargetHourDisplayed) {
+			
+		
+			c.getCalendarNext().click();
+		}
 		
 		
+		targetHour.click();
 		
+		String generatedDate = driver.findElement(By.cssSelector(".wpcf7-form-control-wrap .booking-date")).getAttribute("value");
 		
+		System.out.println("Generated date: " + generatedDate);
+			
+		driver.quit();
+		driver.quit();
+
+	
+	
+	
 		
 	}
 }
@@ -166,4 +192,3 @@ public class calendar extends base{
 
 
 	
-
