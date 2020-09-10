@@ -1,6 +1,10 @@
 package pageObjects;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -21,16 +25,25 @@ public class CalendarPage {
 	By calendarText = By.cssSelector(".wpcf7-form-control-wrap .booking-date");
 	By calendarPrev = By.cssSelector(".xdsoft_timepicker .xdsoft_prev");
 	By calendarNext = By.cssSelector(".xdsoft_timepicker .xdsoft_next");
-
+	By checkDate = By.cssSelector(".wpcf7-form-control-wrap .booking-date");
 	
-	Calendar cal = Calendar.getInstance();
-	int currentYear = cal.get(Calendar.YEAR);
+
 	
 	public int targetYear = 2020;
 	public String targetMonth1 = "October";
 	public int targetDay = 25; 
-	public String targetTime = "16:30";
-	public String targetDateString = "30/08/2020 16:30";
+	public String targetTime = "14:30";
+	
+	public int monthAsInteger;
+	
+	public void MonthAsIntegerMethod() throws ParseException {
+	Date date = new SimpleDateFormat("MMM", Locale.ENGLISH).parse(targetMonth1);
+	 Calendar cal = Calendar.getInstance();
+	 cal.setTime(date);
+	 monthAsInteger = cal.get(Calendar.MONTH)+1;
+	}
+	
+	
 	
 	
 public CalendarPage(WebDriver driver) {
@@ -94,6 +107,11 @@ public WebElement getCalendarPrev() {
 public WebElement getCalendarNext() {
 	
 	return driver.findElement(calendarNext); 
+}
+
+public WebElement getCheckDate() {
+	
+	return driver.findElement(checkDate); 
 }
 
 	
